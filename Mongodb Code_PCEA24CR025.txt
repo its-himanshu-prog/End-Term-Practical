@@ -1,0 +1,240 @@
+Atlas atlas-4gmcnx-shard-0 [primary] library> show dbs
+library  8.00 KiB
+admin         0 B
+local         0 B
+Atlas atlas-4gmcnx-shard-0 [primary] library> use library
+already on db library
+Atlas atlas-4gmcnx-shard-0 [primary] library> db.members.insertMany([
+|   {
+|     name: "Ravi",
+|     address: { city: "Chennai", pin: "600001" },
+|     borrowed: ["Python Basics", "MongoDB Guide"],
+|     fee: 0
+|   },
+|   {
+|     name: "Kumar",
+|     address: { city: "Chennai", pin: "600028" },
+|     borrowed: [],
+|     fee: 0
+|   },
+|   {
+|     name: "Sita",
+|     address: { city: "Mumbai", pin: "400001" },
+|     borrowed: ["MongoDB Guide"],
+|     fee: 50
+|   },
+|   {
+|     name: "Lakshmi",
+|     address: { city: "Jaipur", pin: "302001" },
+|     borrowed: ["Python Basics"],
+|     fee: 120
+|   }
+| ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6b0901bb849dce53d77641f1'),
+    '1': ObjectId('6b0901bb849dce53d77641f2'),
+    '2': ObjectId('6b0901bb849dce53d77641f3'),
+    '3': ObjectId('6b0901bb849dce53d77641f4')
+  }
+}
+Atlas atlas-4gmcnx-shard-0 [primary] library>
+
+Atlas atlas-4gmcnx-shard-0 [primary] library> show dbs
+library  8.00 KiB
+admin         0 B
+local         0 B
+Atlas atlas-4gmcnx-shard-0 [primary] library> show collections
+members
+Atlas atlas-4gmcnx-shard-0 [primary] library> db.members.find(
+|   { "address.city": "Chennai" },
+|   { _id: 0, name: 1, address: 1 }
+| )
+[
+  { name: 'Ravi', address: { city: 'Chennai', pin: '600001' } },
+  { name: 'Kumar', address: { city: 'Chennai', pin: '600028' } }
+]
+Atlas atlas-4gmcnx-shard-0 [primary] library> db.members.find(
+|   { borrowed: "MongoDB Guide" },
+|   { _id: 0, name: 1, borrowed: 1 }
+| )
+[
+  { name: 'Ravi', borrowed: [ 'Python Basics', 'MongoDB Guide' ] },
+  { name: 'Sita', borrowed: [ 'MongoDB Guide' ] }
+]
+Atlas atlas-4gmcnx-shard-0 [primary] library> db.members.find(
+|   { borrowed: { $all: ["Python Basics", "MongoDB Guide"] } },
+|   { _id: 0, name: 1 }
+| )
+[ { name: 'Ravi' } ]
+Atlas atlas-4gmcnx-shard-0 [primary] library> db.members.find(
+|   { borrowed: { $size: 0 } },
+|   { _id: 0, name: 1 }
+| )
+[ { name: 'Kumar' } ]
+Atlas atlas-4gmcnx-shard-0 [primary] library> db.members.updateOne(
+|   { name: "Sita" },
+|   { $set: { "address.city": "Chennai" } }
+| )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+Atlas atlas-4gmcnx-shard-0 [primary] library> db.members.countDocuments({ fee: { $gt: 0 } })
+2
+Atlas atlas-4gmcnx-shard-0 [primary] library> db.members.drop()
+true
+Atlas atlas-4gmcnx-shard-0 [primary] library> show dbs
+sales  8.00 KiB
+admin       0 B
+local       0 B
+Atlas atlas-4gmcnx-shard-0 [primary] library> use sales
+switched to db sales
+Atlas atlas-4gmcnx-shard-0 [primary] sales> db.orders.insertMany([
+|   {
+|     orderId: 1,
+|     customer: "Arun",
+|     product: "Laptop",
+|     category: "Electronics",
+|     qty: 1,
+|     price: 55000
+|   },
+|   {
+|     orderId: 2,
+|     customer: "Divya",
+|     product: "Mouse",
+|     category: "Electronics",
+|     qty: 2,
+|     price: 500
+|   },
+|   {
+|     orderId: 3,
+|     customer: "Arun",
+|     product: "Notebook",
+|     category: "Stationery",
+|     qty: 10,
+|     price: 40
+|   },
+|   {
+|     orderId: 4,
+|     customer: "Meena",
+|     product: "Pen",
+|     category: "Stationery",
+|     qty: 20,
+|     price: 10
+|   },
+|   {
+|     orderId: 5,
+|     customer: "Divya",
+|     product: "Headphones",
+|     category: "Electronics",
+|     qty: 1,
+|     price: 1500
+|   },
+|   {
+|     orderId: 6,
+|     customer: "Karthik",
+|     product: "Chair",
+|     category: "Furniture",
+|     qty: 2,
+|     price: 3500
+|   }
+| ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6b0902b4849dce53d77641f5'),
+    '1': ObjectId('6b0902b4849dce53d77641f6'),
+    '2': ObjectId('6b0902b4849dce53d77641f7'),
+    '3': ObjectId('6b0902b4849dce53d77641f8'),
+    '4': ObjectId('6b0902b4849dce53d77641f9'),
+    '5': ObjectId('6b0902b4849dce53d77641fa')
+  }
+}
+Atlas atlas-4gmcnx-shard-0 [primary] sales> db.orders.aggregate([
+|   { $match: { category: "Electronics" } },
+|   {
+|     $project: {
+|       _id: 0,
+|       orderId: 1,
+|       product: 1
+|     }
+|   }
+| ])
+[
+  { orderId: 1, product: 'Laptop' },
+  { orderId: 2, product: 'Mouse' },
+  { orderId: 5, product: 'Headphones' }
+]
+Atlas atlas-4gmcnx-shard-0 [primary] sales> db.orders.aggregate([
+|   {
+|     $project: {
+|       _id: 0,
+|       orderId: 1,
+|       customer: 1,
+|       lineTotal: { $multiply: ["$qty", "$price"] }
+|     }
+|   }
+| ])
+[
+  { orderId: 1, customer: 'Arun', lineTotal: 55000 },
+  { orderId: 2, customer: 'Divya', lineTotal: 1000 },
+  { orderId: 3, customer: 'Arun', lineTotal: 400 },
+  { orderId: 4, customer: 'Meena', lineTotal: 200 },
+  { orderId: 5, customer: 'Divya', lineTotal: 1500 },
+  { orderId: 6, customer: 'Karthik', lineTotal: 7000 }
+]
+Atlas atlas-4gmcnx-shard-0 [primary] sales> db.orders.aggregate([
+|   {
+|     $group: {
+|       _id: "$category",
+|       totalQty: { $sum: "$qty" }
+|     }
+|   }
+| ])
+[
+  { _id: 'Electronics', totalQty: 4 },
+  { _id: 'Stationery', totalQty: 30 },
+  { _id: 'Furniture', totalQty: 2 }
+]
+Atlas atlas-4gmcnx-shard-0 [primary] sales> db.orders.aggregate([
+|   {
+|     $group: {
+|       _id: "$category",
+|       revenue: {
+|         $sum: { $multiply: ["$qty", "$price"] }
+|       },
+|       avgPrice: { $avg: "$price" }
+|     }
+|   },
+|   {
+|     $sort: { revenue: -1 }
+|   }
+| ])
+[
+  { _id: 'Electronics', revenue: 57500, avgPrice: 19000 },
+  { _id: 'Furniture', revenue: 7000, avgPrice: 3500 },
+  { _id: 'Stationery', revenue: 600, avgPrice: 25 }
+]
+Atlas atlas-4gmcnx-shard-0 [primary] sales> db.orders.aggregate([
+|   {
+|     $group: {
+|       _id: "$customer",
+|       spent: {
+|         $sum: { $multiply: ["$qty", "$price"] }
+|       }
+|     }
+|   },
+|   {
+|     $sort: { spent: -1 }
+|   },
+|   {
+|     $limit: 2
+|   }
+| ])
+[ { _id: 'Arun', spent: 55400 }, { _id: 'Karthik', spent: 7000 } ]
+Atlas atlas-4gmcnx-shard-0 [primary] sales>
